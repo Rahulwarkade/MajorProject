@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp</title>
+  <link rel="stylesheet" href="/stylesheets/profile.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+<body>
+  <div id="main">
+    <div id="overlay">
+      <div id="left">
+        <div id="friend-list">
+          <h1>New Chat</h1>
+          <div class="search">
+            <input id="search-friend" type="text" placeholder="Search or start new chat" >
+            <i class="ri-search-line" style="rotate: -270deg;position: absolute; color: white; right: 60px; opacity: .7;"></i>
+            <div id="searchResult">
+
+            </div>
+          </div>
+        </form>
+        </div>
+        <div id="lef-nav">
+          <div class="profile">
+            <div class="pic">
+              <img src="<%=user.pic%>" alt="">
+            </div>
+            <h3 id="username"><%=user.username%></h3>
+          </div>
+          <div id="chat-icon">
+            <i id="new-chat" class="ri-chat-new-line"></i>
+            <i class="ri-more-line"></i>
+          </div>
+        </div>
+        <div class="search">
+          <input type="text" placeholder="Search or start new chat" >
+          <i class="ri-search-line" style="rotate: -270deg;position: absolute; color: white; right: 60px; opacity: .7;"></i>
+        </div>
+        <div id="list">
+
+        </div>
+      </div>
+      <div id="right">
+
+      </div>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js" integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="/javascripts/index.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.1/socket.io.js" integrity="sha512-Z6C1p1NIexPj5MsVUunW4pg7uMX6/TT3CUVldmjXx2kpip1eZcrAnxIusDxyFIikyM9A61zOVNgvLr/TGudOQg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+    var socket = io();
+    var username = '<%=user.username%>';
+    var friendUsername;
+    socket.emit("newUserConnected",username);
+    function newmsg(currentOppositeUser)
+    {
+      friendUsername = currentOppositeUser;
+        var newMessage = document.querySelector("#newmsg");
+        var currentMessage = {
+            data: newMessage.value,
+            fromUser: username,
+            toUser: currentOppositeUser,
+          }
+        var dt = new Date();
+        var hour = dt.getHours();
+        var ampm = (hour>12) ? "PM" : "AM";
+        var min = dt.getMinutes();
+        var tim = hour + ":" + min + ampm;
+        currentMessage.time = tim;
+        addNewMessage(currentMessage);
+        socket.emit('newmsg', currentMessage)
+        newMessage.value = ''
+    }
+
+    socket.on('chat',chat=>{
+      if(chat.newchat)
+      {
+          addFriend(chat.fromUser,chat.fromUserPic);
+      }
+      else 
+      {
+        addNewMessage(chat);
+      }
+    })
+
+
+    function addNewMessage(chat)
+    {
+      let message;
+      if(chat.fromUser == username)
+      {
+        message = `
+        <div class="outgoing">
+            <div class="outgoingmsg">
+              <p>${chat.data}</p>
+              <span><p>${chat.time}</p></span>
+            </div>
+          </div>
+        `;
+      }
+      else 
+      {
+        message = `
+        <div class="incoming">
+            <div class="incomingmsg">
+              <p>${chat.data}</p>
+              <span><p>${chat.time}</p></span>
+            </div>
+          </div>
+        `;
+      }
+
+      document.querySelector(".conversation").innerHTML += message;
+    }
+  </script>
+</body>
+</html>
