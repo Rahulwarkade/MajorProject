@@ -1,7 +1,7 @@
 var mongoose = require("mongoose"); 
 var passportLocalMongoose = require('passport-local-mongoose');
 
-mongoose.connect('mongodb://127.0.0.1:27017/whatsappDB');
+mongoose.connect('mongodb+srv://rahulwarkade954:<password>@cluster0.u32a3jc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0');
 
 var userSchema = mongoose.Schema({
   username : String,
